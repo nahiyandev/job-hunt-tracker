@@ -1,28 +1,24 @@
 /* globals.css — v3. Tailwind + premium font stacks + dark theme tokens.
    Font stacks: Bengali text automatically falls back to the Bengali
-   fonts (Hind Siliguri / Noto Serif Bengali) loaded via next/font/google
-   in app/layout.tsx — never a generic/system-only stack, never Times
-   New Roman, never Arial-only. */
+   fonts (Hind Siliguri / Noto Serif Bengali) loaded via a <link>
+   stylesheet in app/layout.tsx — never a generic/system-only stack,
+   never Times New Roman, never Arial-only. Do NOT use next/font/google
+   here: its build-time download from fonts.gstatic.com failed on Vercel
+   and broke the whole build (see layout.tsx). */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --font-display: "Plus Jakarta Sans", "Hind Siliguri", system-ui, sans-serif;
-  --font-bn: "Hind Siliguri", "Plus Jakarta Sans", system-ui, sans-serif;
-  --font-bn-serif: "Noto Serif Bengali", "Hind Siliguri", serif;
-}
-
 body {
   background-color: #f9fafb;
   color: #111827;
-  font-family: var(--font-display), "Hind Siliguri", system-ui, sans-serif;
+  font-family: "Plus Jakarta Sans", "Hind Siliguri", system-ui, sans-serif;
 }
 
 h1,
 h2,
 h3 {
-  font-family: var(--font-display), "Noto Serif Bengali", "Hind Siliguri", sans-serif;
+  font-family: "Plus Jakarta Sans", "Noto Serif Bengali", "Hind Siliguri", sans-serif;
 }
 
 /* Dark mode overrides — old pages adapt, and dark mode must never
