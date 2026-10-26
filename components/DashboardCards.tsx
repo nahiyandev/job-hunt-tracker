@@ -1,11 +1,9 @@
-// DashboardCards.tsx — the two rows of stat cards on the dashboard.
+// DashboardCards.tsx — v3 patch: stat cards on the dashboard.
 // All numbers come from the dashboard API; nothing is hard-coded here.
+// Dates use ONE format everywhere: "26 Oct 2026" via lib/date.ts.
 import { Card, CardTitle } from "./ui/card";
+import { formatDate } from "@/lib/date";
 import type { DashboardSummary } from "@/lib/types";
-
-function formatDate(value: string): string {
-  return new Date(value).toLocaleDateString();
-}
 
 export function DashboardCards({ summary }: { summary: DashboardSummary }) {
   return (

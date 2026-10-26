@@ -12,6 +12,9 @@ import { Select } from "@/components/ui/select";
 import { Dialog, ConfirmDialog } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { api } from "@/lib/api";
+import { Footer } from "@/components/Footer";
+import { BottomNav } from "@/components/BottomNav";
+import { SkeletonList } from "@/components/Skeleton";
 import type { ProjectItem, ProjectStatus } from "@/lib/types";
 
 export default function ProjectsPage() {
@@ -24,6 +27,8 @@ export default function ProjectsPage() {
   const [liveLink, setLiveLink] = useState("");
   const [status, setStatus] = useState<ProjectStatus>("Planning");
   const [notes, setNotes] = useState("");
+  const [techStackText, setTechStackText] = useState("");
+  const [repoLink, setRepoLink] = useState("");
 
   async function loadAll() {
     try {
@@ -45,6 +50,8 @@ export default function ProjectsPage() {
     setLiveLink("");
     setStatus("Planning");
     setNotes("");
+    setTechStackText("");
+    setRepoLink("");
     setFormOpen(true);
   }
 
@@ -54,6 +61,8 @@ export default function ProjectsPage() {
     setLiveLink(item.liveLink || "");
     setStatus(item.status);
     setNotes(item.notes || "");
+    setTechStackText((item.techStack || []).join(", "));
+    setRepoLink(item.repoLink || "");
     setFormOpen(true);
   }
 
@@ -65,10 +74,10 @@ export default function ProjectsPage() {
     }
     try {
       if (editing) {
-        await api.updateProject(editing._id, { name, liveLink, status, notes });
+        await api.updateProject(editing._id, { name, liveLink, status, notes, techStack: techStackText.split(",").map((t) => t.trim()).filter(Boolean), repoLink });
         toast.success("Project updated successfully");
       } else {
-        await api.createProject({ name, liveLink, status, notes });
+        await api.createProject({ name, liveLink, status, notes, techStack: techStackText.split(",").map((t) => t.trim()).filter(Boolean), repoLink });
         toast.success("Project added successfully");
       }
       setFormOpen(false);
@@ -93,13 +102,13 @@ export default function ProjectsPage() {
   return (
     <Protected>
       <Navbar />
-      <main className="mx-auto max-w-6xl space-y-4 px-4 py-6">
+      <main className="mx-auto max-w-6xl space-y-4 px-4 py-6 pb-20 sm:pb-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h1 className="text-2xl font-extrabold">Projects</h1>
           <Button onClick={openAdd}>Add Project</Button>
         </div>
         {loading ? (
-          <p className="text-gray-500">Loading projects...</p>
+          <SkeletonList count={3} />
         ) : items.length === 0 ? (
           <p className="py-6 text-center text-gray-500">No projects yet — add your first one.</p>
         ) : (
@@ -112,6 +121,8 @@ export default function ProjectsPage() {
                 </div>
                 <p className="mt-1 text-sm text-gray-500">Status: {item.status}</p>
                 {item.liveLink ? <a href={item.liveLink} target="_blank" rel="noreferrer" className="text-sm text-violet-700 underline">Live Link</a> : null}
+                {item.repoLink ? <span> · <a href={item.repoLink} target="_blank" rel="noreferrer" className="text-sm text-violet-700 underline">Repo</a></span> : null}
+                {item.techStack && item.techStack.length > 0 ? <p className="mt-1 text-sm text-gray-500">{item.techStack.join(", ")}</p> : null}
                 {item.notes ? <p className="mt-2 text-sm text-gray-700">{item.notes}</p> : null}
                 <div className="mt-4 flex gap-1">
                   <Button variant="outline" onClick={() => openEdit(item)}>Edit</Button>
@@ -122,6 +133,8 @@ export default function ProjectsPage() {
           </div>
         )}
       </main>
+      <Footer />
+      <BottomNav />
       <Dialog open={formOpen} onClose={() => setFormOpen(false)} title={editing ? "Edit Project" : "Add Project"}>
         <form onSubmit={handleSubmit} className="space-y-3">
           <div><Label>Project Name *</Label><Input value={name} onChange={(e) => setName(e.target.value)} /></div>
@@ -135,6 +148,8 @@ export default function ProjectsPage() {
               <option value="On Hold">On Hold</option>
             </Select>
           </div>
+          <div><Label>Tech Stack (comma-separated)</Label><Input value={techStackText} onChange={(e) => setTechStackText(e.target.value)} placeholder="React, TypeScript" /></div>
+          <div><Label>Repo Link</Label><Input value={repoLink} onChange={(e) => setRepoLink(e.target.value)} placeholder="https://github.com/..." /></div>
           <div><Label>Notes</Label><Input value={notes} onChange={(e) => setNotes(e.target.value)} /></div>
           <div className="flex justify-end gap-2"><Button type="button" variant="outline" onClick={() => setFormOpen(false)}>Cancel</Button><Button type="submit">Save</Button></div>
         </form>

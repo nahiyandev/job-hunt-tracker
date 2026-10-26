@@ -1,11 +1,13 @@
-// Protected.tsx — wrapper for logged-in pages.
-// While the session loads, show a spinner. Without a session, go to /login.
+// Protected.tsx — v3 wrapper for logged-in pages.
+// While the session loads, show skeleton placeholders (not bare
+// "Loading..." text). Without a session, go to /login.
 // Session persists after refresh because better-auth stores a cookie.
 "use client";
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
+import { SkeletonList } from "./Skeleton";
 
 export function Protected({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -18,7 +20,11 @@ export function Protected({ children }: { children: React.ReactNode }) {
   }, [isPending, session, router]);
 
   if (isPending) {
-    return <p className="mx-auto max-w-6xl p-8 text-gray-500">Loading...</p>;
+    return (
+      <div className="mx-auto max-w-6xl p-8">
+        <SkeletonList count={3} />
+      </div>
+    );
   }
   if (!session) {
     return null;

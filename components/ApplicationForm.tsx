@@ -1,5 +1,7 @@
-// ApplicationForm.tsx — add / edit form inside a Dialog.
+// ApplicationForm.tsx — v3. Add / edit form inside a Dialog.
 // Company + Role are required; missing values show a red toast.
+// v2 fields kept; v3 adds source, recruiter (name/url/notes), CV version
+// and documents (comma-separated links, stored as an array).
 "use client";
 
 import { useEffect, useState } from "react";
@@ -19,6 +21,13 @@ export interface ApplicationFormValues {
   appliedDate: string;
   postingLink: string;
   notes: string;
+  source: string;
+  recruiterName: string;
+  recruiterUrl: string;
+  recruiterNotes: string;
+  cvVersion: string;
+  documents: string[];
+  interviewNotes: string;
 }
 
 const EMPTY: ApplicationFormValues = {
@@ -30,7 +39,16 @@ const EMPTY: ApplicationFormValues = {
   appliedDate: "",
   postingLink: "",
   notes: "",
+  source: "",
+  recruiterName: "",
+  recruiterUrl: "",
+  recruiterNotes: "",
+  cvVersion: "",
+  documents: [],
+  interviewNotes: "",
 };
+
+const STATUSES: ApplicationStatus[] = ["Saved", "Applied", "Assessment", "Interview", "Offer", "Rejected", "Ghosted", "Lead", "Closed"];
 
 export function ApplicationForm({
   open,
@@ -44,6 +62,7 @@ export function ApplicationForm({
   onSubmit: (values: ApplicationFormValues) => Promise<void>;
 }) {
   const [values, setValues] = useState<ApplicationFormValues>(EMPTY);
+  const [documentsText, setDocumentsText] = useState("");
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -57,9 +76,18 @@ export function ApplicationForm({
         appliedDate: initial.appliedDate ? initial.appliedDate.slice(0, 10) : "",
         postingLink: initial.postingLink || "",
         notes: initial.notes || "",
+        source: initial.source || "",
+        recruiterName: initial.recruiterName || "",
+        recruiterUrl: initial.recruiterUrl || "",
+        recruiterNotes: initial.recruiterNotes || "",
+        cvVersion: initial.cvVersion || "",
+        documents: initial.documents || [],
+        interviewNotes: initial.interviewNotes || "",
       });
+      setDocumentsText((initial.documents || []).join(", "));
     } else {
       setValues(EMPTY);
+      setDocumentsText("");
     }
   }, [initial, open]);
 
@@ -73,9 +101,10 @@ export function ApplicationForm({
       toast.error("Please fill Company and Role");
       return;
     }
+    const documents = documentsText.split(",").map((s) => s.trim()).filter(Boolean);
     setSaving(true);
     try {
-      await onSubmit(values);
+      await onSubmit({ ...values, documents });
       onClose();
     } finally {
       setSaving(false);
@@ -95,14 +124,23 @@ export function ApplicationForm({
           <div>
             <Label>Status</Label>
             <Select value={values.status} onChange={(e) => set("status", e.target.value)}>
-              <option value="Applied">Applied</option>
-              <option value="Lead">Lead</option>
-              <option value="Closed">Closed</option>
+              {STATUSES.map((s) => (
+                <option key={s} value={s}>{s}</option>
+              ))}
             </Select>
           </div>
           <div><Label>Applied Date</Label><Input type="date" value={values.appliedDate} onChange={(e) => set("appliedDate", e.target.value)} /></div>
         </div>
         <div><Label>Posting Link</Label><Input value={values.postingLink} onChange={(e) => set("postingLink", e.target.value)} placeholder="https://..." /></div>
+        <div><Label>Source</Label><Input value={values.source} onChange={(e) => set("source", e.target.value)} placeholder="Example: LinkedIn, Bdjobs, referral" /></div>
+        <div className="grid grid-cols-2 gap-3">
+          <div><Label>Recruiter Name</Label><Input value={values.recruiterName} onChange={(e) => set("recruiterName", e.target.value)} /></div>
+          <div><Label>Recruiter Link</Label><Input value={values.recruiterUrl} onChange={(e) => set("recruiterUrl", e.target.value)} placeholder="https://..." /></div>
+        </div>
+        <div><Label>Recruiter Notes</Label><Input value={values.recruiterNotes} onChange={(e) => set("recruiterNotes", e.target.value)} /></div>
+        <div><Label>CV Version</Label><Input value={values.cvVersion} onChange={(e) => set("cvVersion", e.target.value)} placeholder="Example: v2-frontend" /></div>
+        <div><Label>Documents (comma-separated links)</Label><Input value={documentsText} onChange={(e) => setDocumentsText(e.target.value)} placeholder="https://..., https://..." /></div>
+        <div><Label>Interview Notes</Label><Input value={values.interviewNotes} onChange={(e) => set("interviewNotes", e.target.value)} /></div>
         <div><Label>Notes</Label><Input value={values.notes} onChange={(e) => set("notes", e.target.value)} /></div>
         <div className="flex justify-end gap-2 pt-2">
           <Button type="button" variant="outline" onClick={onClose}>Cancel</Button>

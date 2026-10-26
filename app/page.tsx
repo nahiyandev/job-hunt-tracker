@@ -8,6 +8,7 @@
 import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
+import { Footer } from "@/components/Footer";
 
 const FEATURES = [
   {
@@ -208,17 +209,19 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t bg-white">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-6 text-sm text-gray-500">
-          <span className="font-bold text-gray-800">Job Hunt Tracker</span>
-          <span>Track applications, follow-ups, LinkedIn activity and projects.</span>
-          <div className="flex gap-4">
-            <Link href="/login" className="hover:text-gray-900">Login</Link>
-            <Link href="/dashboard" className="hover:text-gray-900">Dashboard</Link>
-          </div>
+      {/* v3 CTAs */}
+      <section className="mx-auto max-w-6xl px-4 pb-12">
+        <div className="flex flex-wrap justify-center gap-3">
+          <Link href="/feed">
+            <Button variant="secondary" className="px-6 py-3 text-base">Browse Job Feed →</Button>
+          </Link>
+          <Link href="/tools/resume-matcher">
+            <Button variant="outline" className="px-6 py-3 text-base">Check My Resume Match →</Button>
+          </Link>
         </div>
-      </footer>
+      </section>
+
+      <Footer />
     </main>
   );
 }

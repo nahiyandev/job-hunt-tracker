@@ -1,4 +1,5 @@
-// admin/page.tsx — the admin route (/admin).
+// admin/page.tsx — v3. The admin route (/admin).
+// v3: role 'user' sees ONLY an access-denied card — no user list, no role controls, no admin controls. Server already rejects; this is UI only. Plus Footer + skeleton + lib/date.ts.
 // Tabs: Users and Keywords/Sources. Admins have full access here;
 // moderators can view users and manage keywords, but the backend blocks
 // them from changing roles or disabling users (those buttons are also
@@ -16,6 +17,9 @@ import { Input, Label } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { api } from "@/lib/api";
+import { Footer } from "@/components/Footer";
+import { SkeletonList } from "@/components/Skeleton";
+import { formatDate } from "@/lib/date";
 import { authClient } from "@/lib/auth-client";
 import type { KeywordItem, PublicUser } from "@/lib/types";
 
@@ -116,8 +120,13 @@ export default function AdminPage() {
           Admins have full access. Moderators can view users and manage keywords/sources, but cannot change roles,
           enable/disable users, or see any user&apos;s private tracker data.
         </p>
-        {loading ? (
-          <p className="text-gray-500">Loading...</p>
+        {myRole === "user" ? (
+          <Card>
+            <h3 className="font-bold">Access denied</h3>
+            <p className="mt-2 text-gray-700">This page is for admins and moderators only. Your tracker data is private and is not shown here.</p>
+          </Card>
+        ) : loading ? (
+          <SkeletonList count={3} />
         ) : denied ? (
           <Card><p className="text-gray-700">Admin or moderator access only. If you are the owner, follow the first-admin steps in README.md.</p></Card>
         ) : (
@@ -139,7 +148,7 @@ export default function AdminPage() {
                           ) : null}
                           <div>
                             <p className="font-semibold">{user.name || "(no name)"} <Badge tone={user.role === "admin" ? "purple" : user.role === "moderator" ? "orange" : "gray"}>{user.role}</Badge> {user.status === "disabled" ? <Badge tone="red">disabled</Badge> : null}</p>
-                            <p className="text-sm text-gray-500">{user.email} · Joined {new Date(user.createdAt).toLocaleDateString()}</p>
+                            <p className="text-sm text-gray-500">{user.email} · Joined {formatDate(user.createdAt)}</p>
                           </div>
                         </div>
                         {isAdmin ? (
@@ -196,6 +205,7 @@ export default function AdminPage() {
           </>
         )}
       </main>
+      <Footer />
     </Protected>
   );
 }

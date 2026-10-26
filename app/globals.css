@@ -1,9 +1,76 @@
-/* globals.css — Tailwind styles + light theme background. */
+/* globals.css — v3. Tailwind + premium font stacks + dark theme tokens.
+   Font stacks: Bengali text automatically falls back to the Bengali
+   fonts (Hind Siliguri / Noto Serif Bengali) loaded via next/font/google
+   in app/layout.tsx — never a generic/system-only stack, never Times
+   New Roman, never Arial-only. */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --font-display: "Plus Jakarta Sans", "Hind Siliguri", system-ui, sans-serif;
+  --font-bn: "Hind Siliguri", "Plus Jakarta Sans", system-ui, sans-serif;
+  --font-bn-serif: "Noto Serif Bengali", "Hind Siliguri", serif;
+}
+
 body {
   background-color: #f9fafb;
   color: #111827;
+  font-family: var(--font-display), "Hind Siliguri", system-ui, sans-serif;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display), "Noto Serif Bengali", "Hind Siliguri", sans-serif;
+}
+
+/* Dark mode overrides — old pages adapt, and dark mode must never
+   hide black text on a black background. */
+.dark body {
+  background-color: #111827;
+  color: #f9fafb;
+}
+.dark .bg-white {
+  background-color: #1f2937;
+}
+.dark .text-gray-900 {
+  color: #f9fafb;
+}
+.dark .text-gray-800 {
+  color: #e5e7eb;
+}
+.dark .text-gray-700 {
+  color: #e5e7eb;
+}
+.dark .text-gray-600 {
+  color: #d1d5db;
+}
+.dark .text-gray-500 {
+  color: #9ca3af;
+}
+.dark .border-gray-200,
+.dark .border-gray-100 {
+  border-color: #374151;
+}
+.dark .bg-gray-50 {
+  background-color: #1f2937;
+}
+.dark .bg-gray-100 {
+  background-color: #374151;
+}
+.dark .bg-orange-50 {
+  background-color: #431407;
+}
+.dark .bg-green-50 {
+  background-color: #052e16;
+}
+.dark .bg-yellow-50 {
+  background-color: #422006;
+}
+.dark .bg-red-50 {
+  background-color: #450a0a;
+}
+.dark .bg-violet-50 {
+  background-color: #2e1065;
 }

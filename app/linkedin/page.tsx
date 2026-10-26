@@ -12,6 +12,10 @@ import { Input, Label } from "@/components/ui/input";
 import { Dialog, ConfirmDialog } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { api } from "@/lib/api";
+import { Footer } from "@/components/Footer";
+import { BottomNav } from "@/components/BottomNav";
+import { SkeletonList } from "@/components/Skeleton";
+import { formatDate } from "@/lib/date";
 import type { LinkedInDayItem } from "@/lib/types";
 
 export default function LinkedinPage() {
@@ -95,7 +99,7 @@ export default function LinkedinPage() {
   return (
     <Protected>
       <Navbar />
-      <main className="mx-auto max-w-6xl space-y-4 px-4 py-6">
+      <main className="mx-auto max-w-6xl space-y-4 px-4 py-6 pb-20 sm:pb-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h1 className="text-2xl font-extrabold">LinkedIn Daily</h1>
           <Button onClick={openAdd}>Add Day</Button>
@@ -103,7 +107,7 @@ export default function LinkedinPage() {
         <p className="text-sm text-gray-500">Total comments (live sum): {totalComments}</p>
         <Card>
           {loading ? (
-            <p className="text-gray-500">Loading...</p>
+            <SkeletonList count={3} />
           ) : rows.length === 0 ? (
             <p className="py-6 text-center text-gray-500">No LinkedIn days yet — add your first one.</p>
           ) : (
@@ -112,7 +116,7 @@ export default function LinkedinPage() {
                 <li key={row._id} className="flex flex-wrap items-center justify-between gap-3 py-3">
                   <div>
                     <p className="font-semibold">
-                      {new Date(row.date).toLocaleDateString()} {row.isDemo ? <Badge tone="purple">DEMO</Badge> : null}
+                      {formatDate(row.date)} {row.isDemo ? <Badge tone="purple">DEMO</Badge> : null}
                     </p>
                     <p className="text-sm text-gray-500">Comments: {row.comments} · Posts: {row.posts}{row.notes ? ` · ${row.notes}` : ""}</p>
                   </div>
@@ -126,6 +130,8 @@ export default function LinkedinPage() {
           )}
         </Card>
       </main>
+      <Footer />
+      <BottomNav />
       <Dialog open={formOpen} onClose={() => setFormOpen(false)} title={editing ? "Edit Day" : "Add Day"}>
         <form onSubmit={handleSubmit} className="space-y-3">
           <div><Label>Date</Label><Input type="date" value={date} onChange={(e) => setDate(e.target.value)} /></div>
